@@ -67,15 +67,19 @@ let lexer = Lexer(rules: [
 
 // Tokenize and parse
 
+func parse(_ input: String) throws -> ArithmeticExpression {
+  try lexer.tokenize(input) { (t, c) in
+    try parser.consume(token: t, code: c)
+  }
+  return try parser.endParsing()
+}
+
 if CommandLine.argc != 2 {
     print("Pass the expression to be parsed as a quoted argument.")
 } else {
     let inputString = CommandLine.arguments[1]
     do {
-        try lexer.tokenize(inputString) { (t, c) in
-            try parser.consume(token: t, code: c)
-        }
-        let tree = try parser.endParsing()
+        let tree = try parse(inputString)
         print("\(tree)")
     } catch (let error) {
         print("Error during parsing: \(error)")
