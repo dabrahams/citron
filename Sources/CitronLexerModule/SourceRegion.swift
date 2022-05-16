@@ -17,6 +17,9 @@ public struct SourcePosition: Comparable, Hashable {
   public static func < (l: Self, r: Self) -> Bool {
     (l.line, l.column) < (r.line, r.column)
   }
+
+  /// Creates an instance with the given line and column.
+  public init(line: Int, column: Int) { (self.line, self.column) = (line, column) }
 }
 
 /// A contiguous region of text in a particular source file.
