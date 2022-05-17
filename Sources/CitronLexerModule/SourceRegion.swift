@@ -25,7 +25,7 @@ public struct SourcePosition: Comparable, Hashable {
 /// A contiguous region of text in a particular source file.
 public struct SourceRegion: Hashable {
   /// Creates an instance that covers `span` in the file named by `f`.
-  init(fileName f: String, _ span: Range<SourcePosition>) {
+  public init(fileName f: String, _ span: Range<SourcePosition>) {
     self.fileName = f
     self.span = span
   }
