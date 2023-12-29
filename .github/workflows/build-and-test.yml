@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
         configuration: [debug]
 
@@ -36,6 +36,10 @@ jobs:
           # Default values to add
           - shell: 'bash -eo pipefail {0}'
           - build-options: '--explicit-target-dependency-import-check=error'
+
+          # Overrides for the defaults
+          - shell: pwsh
+            os: windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -48,11 +52,29 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Swift (Unices)
+        if: ${{ matrix.os != 'windows-latest' }}
         uses: 'swift-actions/setup-swift@v1'
         with:
           version: 5.9
+
+      - name: Setup Swift (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: 'compnerd/gha-setup-swift@main'
+        with:
+          github-repo: thebrowsercompany/swift-build
+          release-asset-name: installer-amd64.exe
+          release-tag-name: 20231010.3
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Test (${{ matrix.configuration }})
         run: >
           swift test -c ${{ matrix.configuration }} ${{ matrix.build-options }}
           --explicit-target-dependency-import-check=error
+
+      - name: Test non-reentrant build (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          swift package clean
+          $env:SPM_BUILD_TOOL_SUPPORT_NO_REENTRANT_BUILD=1
+          swift build -c ${{ matrix.configuration }} ${{ matrix.build-options }} --product citron
+          swift test -c ${{ matrix.configuration }} ${{ matrix.build-options }}
