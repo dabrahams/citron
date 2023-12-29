@@ -1,7 +1,16 @@
 // swift-tools-version:5.6
 // The swift-tools-version declares the minimum version of Swift required to build this package.
-
+import Foundation
 import PackageDescription
+
+// Define a constant to clean up dependency management for SPM bug workarounds (see
+// LocalTargetCommandDemoPlugin below).  Swift only allows conditional compilation at statement
+// granularity so that becomes very inconvenient otherwise.
+#if os(Windows)
+let osIsWindows = true
+#else
+let osIsWindows = false
+#endif
 
 let package = Package(
     name: "citron",
@@ -12,12 +21,12 @@ let package = Package(
         .plugin(name: "CitronParserGenerator", targets: ["CitronParserGenerator"])
     ],
     targets: [
-      .executableTarget(name: "citron"),
+      .executableTarget(name: "citron")
       .target(name: "CitronParserModule", exclude: ["LICENSE.txt"]),
       .target(name: "CitronLexerModule", exclude: ["LICENSE.txt"]),
       .plugin(
         name: "CitronParserGenerator", capability: .buildTool(),
-        dependencies: ["citron"]),
+        dependencies: osIsWindows ? [] : ["citron"]),
 
       // Examples
       .executableTarget(
