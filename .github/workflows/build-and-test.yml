@@ -3,21 +3,7 @@ name: Build and test
 
 "on":
   push:
-    branches: [main, rewrite]
-    paths-ignore:
-      - "Docs/**"
-      - "**.md"
-      - "README.md"
-      - "LICENSE"
-      - ".gitignore"
-  pull_request:
     branches: ["**"]
-    paths-ignore:
-      - "Docs/**"
-      - "**.md"
-      - "README.md"
-      - "LICENSE"
-      - ".gitignore"
 
 jobs:
 
