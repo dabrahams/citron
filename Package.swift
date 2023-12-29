@@ -21,9 +21,10 @@ let package = Package(
         .plugin(name: "CitronParserGenerator", targets: ["CitronParserGenerator"])
     ],
     targets: [
-      .executableTarget(name: "citron")
+      .executableTarget(name: "citron", dependencies: ["CitronCLibrary"]),
       .target(name: "CitronParserModule", exclude: ["LICENSE.txt"]),
       .target(name: "CitronLexerModule", exclude: ["LICENSE.txt"]),
+      .target(name: "CitronCLibrary"),
       .plugin(
         name: "CitronParserGenerator", capability: .buildTool(),
         dependencies: osIsWindows ? [] : ["citron"]),

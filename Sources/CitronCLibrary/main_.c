@@ -1558,7 +1558,7 @@ static void stats_line(const char *zLabel, int iValue){
 }
 
 /* The main program.  Parse the command line and do it... */
-int main(int argc, char **argv)
+int main_(int argc, char **argv)
 {
   static int version = 0;
   static int help = 0;
