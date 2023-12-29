@@ -59,8 +59,9 @@ let package = Package(
         plugins: [.plugin(name: "CitronParserGenerator")]),
 
       .testTarget(
-          name: "CitronTests",
-          dependencies: ["expr", "expr_ec", "functype", "functype_ec"]
+        name: "CitronTests",
+        // https://github.com/apple/swift-package-manager/issues/6367
+        dependencies: osIsWindows ? [] : ["expr", "expr_ec", "functype", "functype_ec"]
       ),
     ]
 )

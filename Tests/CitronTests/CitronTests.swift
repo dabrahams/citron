@@ -1,10 +1,12 @@
 import XCTest
+
+#if !os(Windows) // Disabled on Windows pending https://github.com/apple/swift-package-manager/issues/6367
 @testable import expr
 @testable import expr_ec
 @testable import functype
 @testable import functype_ec
 
-final class CitronTests: XCTestCase {
+final class ExampleTests: XCTestCase {
 
   func test_expr() throws {
     let (lexer, parser) = expr.makeLexerAndParser()
@@ -46,3 +48,4 @@ final class CitronTests: XCTestCase {
   }
 
 }
+#endif
