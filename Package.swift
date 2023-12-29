@@ -3,6 +3,15 @@
 
 import PackageDescription
 
+// Define a constant to clean up dependency management for SPM bug workarounds (see
+// LocalTargetCommandDemoPlugin below).  Swift only allows conditional compilation at statement
+// granularity so that becomes very inconvenient otherwise.
+#if os(Windows)
+let osIsWindows = true
+#else
+let osIsWindows = false
+#endif
+
 let package = Package(
     name: "citron",
     products: [
@@ -17,7 +26,7 @@ let package = Package(
       .target(name: "CitronLexerModule", exclude: ["LICENSE.txt"]),
       .plugin(
         name: "CitronParserGenerator", capability: .buildTool(),
-        dependencies: ["citron"]),
+        dependencies: osIsWindows ? [] : ["citron"]),
 
       // Examples
       .executableTarget(
