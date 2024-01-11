@@ -21,9 +21,7 @@ let package = Package(
         .plugin(name: "CitronParserGenerator", targets: ["CitronParserGenerator"])
     ],
     targets: [
-     .executableTarget(
-        name: "citron", dependencies: ["CitronCLibrary"],
-        swiftSettings: [ .unsafeFlags(["-parse-as-library"]) ]),
+      .executableTarget(name: "citron", dependencies: ["CitronCLibrary"]),
       .target(name: "CitronParserModule", exclude: ["LICENSE.txt"]),
       .target(name: "CitronLexerModule", exclude: ["LICENSE.txt"]),
       .target(name: "CitronCLibrary"),
