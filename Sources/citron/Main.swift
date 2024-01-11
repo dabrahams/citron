@@ -1,2 +1,7 @@
 import CitronCLibrary
-_ = main_(CommandLine.argc, CommandLine.unsafeArgv)
+
+@main struct CitronExecutable {
+  static func main() {
+    _ = main_(CommandLine.argc, CommandLine.unsafeArgv)
+  }
+}
