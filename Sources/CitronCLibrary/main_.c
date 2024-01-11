@@ -1558,7 +1558,7 @@ static void stats_line(const char *zLabel, int iValue){
 }
 
 /* The main program.  Parse the command line and do it... */
-int main(int argc, char **argv)
+int main_(int argc, char **argv)
 {
   static int version = 0;
   static int help = 0;
@@ -3789,6 +3789,51 @@ void dump_state_info(int index, struct state *stp) {
     }
 }
 
+// Lifted substantially from https://stackoverflow.com/a/22151084
+
+/// Writes the Swift string literal representing `s` into `target`.
+///
+/// Expects the contents of `s` to be Latin-1; if it's UTF-8 some more
+/// code would have to be written to decode the unicode scalars.
+void write_SwiftStringLiteral(FILE* target, char* s) {
+
+  fprintf(target, "\"");
+  for (; *s; ++s) {
+    switch (*s) {
+      case '\0':
+	fprintf(target, "\\0");
+	break;
+      case '\n':
+	fprintf(target, "\\n");
+	break;
+      case '\r':
+	fprintf(target, "\\r");
+	break;
+      case '\t':
+	fprintf(target, "\\t");
+	break;
+      case '\\':
+	fprintf(target, "\\\\");
+	break;
+      case '"':
+	fprintf(target, "\\\"");
+	break;
+
+      default:
+	fprintf(target, isprint(*s) ? "%c" : "\\u{%02x}", *s);
+	break;
+      }
+  }
+
+  fprintf(target, "\"");
+}
+
+void writeSourceLocation(FILE* target, char* filename, int line) {
+  fprintf(target, "#sourceLocation(file: ");
+  write_SwiftStringLiteral(target, filename);
+  fprintf(target, ", line: %d)\n", line);
+}
+
 /* Generate C source code for the parser */
 void ReportTable(struct lemon *lemp){
   FILE *out;
@@ -3817,7 +3862,7 @@ void ReportTable(struct lemon *lemp){
 
   if (lemp->preface) {
     fprintf(out, "// Preface\n\n");
-    fprintf(out, "#sourceLocation(file: \"%s\", line: %d)\n", lemp->filename, lemp->prefaceLineNumber);
+    writeSourceLocation(out, lemp->filename, lemp->prefaceLineNumber);
     fprintf(out, "%s\n", lemp->preface);
     fprintf(out, "#sourceLocation()\n\n");
   }
@@ -4194,8 +4239,8 @@ void ReportTable(struct lemon *lemp){
   /* Generate code which execution during each REDUCE action */
   fprintf(out, "    func yyInvokeCodeBlockForRule(ruleNumber: CitronRuleNumber) throws -> CitronSymbol {\n");
   if (lemp->vartype && lemp->defaultCodeBlock) {
-    fprintf(out, "        func defaultCodeBlockForDefaultNonterminalType() -> %s {", lemp->vartype);
-    fprintf(out, "\n#sourceLocation(file: \"%s\", line: %d)\n", lemp->filename, lemp->defaultCodeBlockLineNumber);
+    fprintf(out, "        func defaultCodeBlockForDefaultNonterminalType() -> %s {\n", lemp->vartype);
+    writeSourceLocation(out, lemp->filename, lemp->defaultCodeBlockLineNumber);
     fprintf(out, "%s", lemp->defaultCodeBlock);
     fprintf(out, "\n#sourceLocation()\n");
     fprintf(out, "        }\n");
@@ -4203,8 +4248,8 @@ void ReportTable(struct lemon *lemp){
   for (i = 1 /* Skip the base symbol */; i < lemp->nsymbol; i++) {
     struct symbol *sp = lemp->symbols[i];
     if (sp->type==NONTERMINAL && sp->datatype != 0 && sp->code != 0) {
-      fprintf(out, "        func defaultCodeBlockForType%d() -> %s {", sp->dtnum, sp->datatype);
-      fprintf(out, "\n#sourceLocation(file: \"%s\", line: %d)\n", lemp->filename, sp->codeLineNumber);
+      fprintf(out, "        func defaultCodeBlockForType%d() -> %s {\n", sp->dtnum, sp->datatype);
+      writeSourceLocation(out, lemp->filename, sp->codeLineNumber);
       fprintf(out, "%s", sp->code);
       fprintf(out, "\n#sourceLocation()\n");
       fprintf(out, "        }\n");
@@ -4243,7 +4288,8 @@ void ReportTable(struct lemon *lemp){
     assert(lhstype);
     fprintf(out, ") throws -> %s {", lhstype);
     if (rp->code) {
-      fprintf(out, "\n#sourceLocation(file: \"%s\", line: %d)\n", lemp->filename, rp->line);
+      fprintf(out, "\n");
+      writeSourceLocation(out, lemp->filename, rp->line);
       fprintf(out, "%s", rp->code);
       fprintf(out, "\n#sourceLocation()\n");
     } else if (rp->lhs->datatype && rp->lhs->code) {
@@ -4585,7 +4631,7 @@ void ReportTable(struct lemon *lemp){
 
   if (lemp->epilogue) {
     fprintf(out, "// Epilogue\n\n");
-    fprintf(out, "#sourceLocation(file: \"%s\", line: %d)\n", lemp->filename, lemp->epilogueLineNumber);
+    writeSourceLocation(out, lemp->filename, lemp->epilogueLineNumber);
     fprintf(out, "%s\n", lemp->epilogue);
     fprintf(out, "#sourceLocation()\n\n");
   }
