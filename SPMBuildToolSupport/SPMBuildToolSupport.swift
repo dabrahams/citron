@@ -174,8 +174,7 @@ public extension PackagePlugin.Target {
 
 public extension PackagePlugin.Package {
 
-
-  /// All the source files on which any executable target named `targetName` depends.
+  /// Returns all the source files on which any executable target named `targetName` depends.
   // This is a very conservative check because we have no way of knowing which package the plugin
   // itself was defined in!
   func sourceDependencies(ofTargetsNamed targetName: String) -> Set<URL> {

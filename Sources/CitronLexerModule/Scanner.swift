@@ -89,10 +89,22 @@ public extension Scanner {
     in sourceText: String, fromFile path: String,
     unrecognizedCharacter: TokenID
   ) -> Tokens {
-    return .init(
+    .init(
       in: sourceText, fromFile: path,
       matchers: matchers, literalStrings: literalStrings,
       unrecognizedCharacter: unrecognizedCharacter)
+  }
+
+  /// Returns the sequence of tokens in the given source text, with
+  /// their source ranges indicating they were extracted from the file
+  /// at `path`, with `unrecognizedToken` being the ID of tokens
+  /// created when none of the source patterns matches.
+  @available(*, deprecated, message: "use tokens(in:fromFile:unrecognizedCharacter:) instead")
+  func tokens(
+    in sourceText: String, fromFile path: String,
+    unrecognizedToken: TokenID
+  ) -> Tokens {
+    tokens(in: sourceText, fromFile: path, unrecognizedCharacter: unrecognizedToken)
   }
 }
 
