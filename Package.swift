@@ -47,5 +47,11 @@ let package = Package(
         path: "examples/functype_ec",
         exclude: ["README.md", "Makefile"],
         plugins: [.plugin(name: "CitronParserGenerator")]),
+
+      .testTarget(
+        name: "ExampleTests",
+        // https://github.com/apple/swift-package-manager/issues/6367
+        dependencies: ["expr"]
+      ),
     ]
 )
