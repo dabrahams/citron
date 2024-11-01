@@ -4,7 +4,7 @@
 
 /// A position relative to the beginning of a source file, in terms understood
 /// by text editors.
-public struct SourcePosition: Comparable, Hashable {
+public struct SourcePosition: Comparable, Hashable, Sendable {
   /// The 1-based line number of the position.
   public var line: Int
   /// The 1-based column number of the position.
@@ -23,7 +23,7 @@ public struct SourcePosition: Comparable, Hashable {
 }
 
 /// A contiguous region of text in a particular source file.
-public struct SourceRegion: Hashable {
+public struct SourceRegion: Hashable, Sendable {
   /// Creates an instance that covers `span` in the file named by `f`.
   public init(fileName f: String, _ span: Range<SourcePosition>) {
     self.fileName = f
@@ -39,7 +39,7 @@ public struct SourceRegion: Hashable {
 
   /// An empty location instance that can be used for synthesized AST nodes,
   /// etc.
-  public static var empty
+  public static let empty
     = SourceRegion(fileName: "", .start ..< .start)
 
   /// Returns the region from the beginning of `first` to the end of `last`,
